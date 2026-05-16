@@ -246,6 +246,10 @@ export interface IFaceIdentityBackfillJob extends IBaseJob {
   continuationCount?: number;
 }
 
+export interface IPersonSuggestionScanJob extends IBaseJob {
+  id: string;
+}
+
 export interface ISharedSpaceFaceMatchJob extends IBaseJob {
   spaceId: string;
   assetId: string;
@@ -426,6 +430,8 @@ export type JobItem =
   | { name: JobName.FacialRecognition; data: IFacialRecognitionJob }
   | { name: JobName.FaceIdentityBackfill; data: IFaceIdentityBackfillJob }
   | { name: JobName.FaceIdentityMaintenanceAfterRecognition; data: IDelayedJob }
+  | { name: JobName.PersonSuggestionScanQueueAll; data: IBaseJob }
+  | { name: JobName.PersonSuggestionScan; data: IPersonSuggestionScanJob }
   | { name: JobName.PersonGenerateThumbnail; data: IEntityJob }
 
   // Smart Search

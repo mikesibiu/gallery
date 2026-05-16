@@ -23479,6 +23479,8 @@
           "FacialRecognition",
           "FaceIdentityBackfill",
           "FaceIdentityMaintenanceAfterRecognition",
+          "PersonSuggestionScanQueueAll",
+          "PersonSuggestionScan",
           "FileDelete",
           "FileMigrationQueueAll",
           "LibraryDeleteCheck",

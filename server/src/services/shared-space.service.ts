@@ -1269,6 +1269,12 @@ export class SharedSpaceService extends BaseService {
     });
   }
 
+  private async resolveMovedSpacePersonFaces(faceIds: Array<{ assetFaceId: string }>): Promise<void> {
+    for (const { assetFaceId } of faceIds) {
+      await this.personFaceSuggestionRepository.resolveAssignedFace(assetFaceId);
+    }
+  }
+
   async mergeSpacePeople(
     auth: AuthDto,
     spaceId: string,
@@ -1302,7 +1308,16 @@ export class SharedSpaceService extends BaseService {
       }
     }
 
+    // Capture the source people's face ids before the merge so any pending suggestions for
+    // those faces can be resolved once the merge reassigns them to the target person.
+    const movedFaceIds: Array<{ assetFaceId: string }> = [];
+    for (const source of sources) {
+      movedFaceIds.push(...(await this.sharedSpaceRepository.getFaceIdsForPerson(source.id)));
+    }
+
     await this.identityMergePropagationService.mergeSpacePeople(auth, spaceId, targetPersonId, dto.ids);
+
+    await this.resolveMovedSpacePersonFaces(movedFaceIds);
   }
 
   async setSpacePersonAlias(
@@ -1862,7 +1877,9 @@ export class SharedSpaceService extends BaseService {
       );
 
       // Reassign faces and migrate aliases
+      const movedFaceIds = await this.sharedSpaceRepository.getFaceIdsForPerson(source.id);
       await this.sharedSpaceRepository.reassignPersonFacesSafe(source.id, target.id);
+      await this.resolveMovedSpacePersonFaces(movedFaceIds);
       await this.sharedSpaceRepository.migrateAliases(source.id, target.id);
 
       const candidateIdentityIds = [target.identityId, source.identityId].filter(

@@ -42,6 +42,7 @@
     dismissSpacePersonFaceSuggestion,
     getSpacePersonFaces,
     getSpacePersonFaceSuggestions,
+    ignoreSpacePersonFaceSuggestion,
     getSpacePeople,
     mergeSpacePeople,
     mergeScopedPeople,
@@ -491,6 +492,8 @@
         confirmSpacePersonFaceSuggestion({ id: currentSpaceId, personId: currentPersonId, assetFaceId }),
       dismiss: (assetFaceId: string) =>
         dismissSpacePersonFaceSuggestion({ id: currentSpaceId, personId: currentPersonId, assetFaceId }),
+      ignore: (assetFaceId: string) =>
+        ignoreSpacePersonFaceSuggestion({ id: currentSpaceId, personId: currentPersonId, assetFaceId }),
     });
 
     await loadSuggestionSummary(currentSpaceId, currentPersonId);

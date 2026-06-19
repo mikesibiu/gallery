@@ -131,7 +131,7 @@ export class TimelineManager extends VirtualScrollManager {
   #websocketSupport: WebsocketSupport | undefined;
   #options: TimelineManagerOptions = TimelineManager.#INIT_OPTIONS;
   #updatingViewportProximities = false;
-  #scrollableElement: HTMLElement | undefined = $state();
+  #scrollableElement: HTMLElement | undefined = $state.raw();
   #showAssetOwners = new PersistedLocalStorage<boolean>('album-show-asset-owners', false);
   #unsubscribes: Array<() => void> = [];
   #initSequence = 0;
@@ -161,7 +161,7 @@ export class TimelineManager extends VirtualScrollManager {
     );
   }
 
-  override get scrollTop(): number {
+  override get domScrollTop(): number {
     return this.#scrollableElement?.scrollTop ?? 0;
   }
 
@@ -170,13 +170,12 @@ export class TimelineManager extends VirtualScrollManager {
   }
 
   scrollTo(top: number) {
-    this.#scrollableElement?.scrollTo({ top });
+    this.#scrollableElement?.scrollTo({ top: clamp(this.logicalToDom(top), 0, this.domScrollMax) });
     this.updateSlidingWindow();
   }
 
   scrollBy(y: number) {
-    this.#scrollableElement?.scrollBy(0, y);
-    this.updateSlidingWindow();
+    this.scrollTo(this.scrollTop + y);
   }
 
   async *assetsIterator(options?: {

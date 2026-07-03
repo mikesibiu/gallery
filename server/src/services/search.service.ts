@@ -91,8 +91,7 @@ export class SearchService extends BaseService {
   }
 
   async getExploreData(auth: AuthDto) {
-    const options = { maxFields: 12, minAssetsPerField: 5 };
-
+    const options = { maxFields: 12, minAssetsPerField: 1 };
     const cities = await this.assetRepository.getAssetIdByCity(auth.user.id, options);
     const cityAssets = await this.assetRepository.getByIdsWithAllRelationsButStacks(
       cities.items.map(({ data }) => data),

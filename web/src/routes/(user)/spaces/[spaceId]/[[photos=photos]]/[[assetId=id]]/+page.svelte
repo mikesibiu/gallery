@@ -1126,8 +1126,8 @@
                   assetCount={space.assetCount ?? 0}
                   currentRole={currentMember?.role}
                   gradientClass={spaceGradient}
-                  onSetCover={isEditor ? openSelectCover : undefined}
-                  onReposition={isEditor && space.thumbnailAssetId ? handleReposition : undefined}
+                  onSetCover={openSelectCover}
+                  onReposition={space.thumbnailAssetId ? handleReposition : undefined}
                   {repositioning}
                   onSavePosition={handleSavePosition}
                   onCancelReposition={handleCancelReposition}

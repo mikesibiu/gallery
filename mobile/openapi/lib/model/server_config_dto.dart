@@ -13,6 +13,8 @@ part of openapi.api;
 class ServerConfigDto {
   /// Returns a new [ServerConfigDto] instance.
   ServerConfigDto({
+    required this.demoAutoLogin,
+    required this.demoMode,
     required this.externalDomain,
     required this.isInitialized,
     required this.isOnboarded,
@@ -26,6 +28,11 @@ class ServerConfigDto {
     required this.trashDays,
     required this.userDeleteDelay,
   });
+
+  /// Whether demo auto-login is enabled
+  bool demoAutoLogin;
+
+  bool demoMode;
 
   /// External domain URL
   String externalDomain;
@@ -74,6 +81,8 @@ class ServerConfigDto {
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is ServerConfigDto &&
+    other.demoAutoLogin == demoAutoLogin &&
+    other.demoMode == demoMode &&
     other.externalDomain == externalDomain &&
     other.isInitialized == isInitialized &&
     other.isOnboarded == isOnboarded &&
@@ -90,6 +99,8 @@ class ServerConfigDto {
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
+    (demoAutoLogin.hashCode) +
+    (demoMode.hashCode) +
     (externalDomain.hashCode) +
     (isInitialized.hashCode) +
     (isOnboarded.hashCode) +
@@ -104,10 +115,12 @@ class ServerConfigDto {
     (userDeleteDelay.hashCode);
 
   @override
-  String toString() => 'ServerConfigDto[externalDomain=$externalDomain, isInitialized=$isInitialized, isOnboarded=$isOnboarded, loginPageMessage=$loginPageMessage, maintenanceMode=$maintenanceMode, mapDarkStyleUrl=$mapDarkStyleUrl, mapLightStyleUrl=$mapLightStyleUrl, minFaces=$minFaces, oauthButtonText=$oauthButtonText, publicUsers=$publicUsers, trashDays=$trashDays, userDeleteDelay=$userDeleteDelay]';
+  String toString() => 'ServerConfigDto[demoAutoLogin=$demoAutoLogin, demoMode=$demoMode, externalDomain=$externalDomain, isInitialized=$isInitialized, isOnboarded=$isOnboarded, loginPageMessage=$loginPageMessage, maintenanceMode=$maintenanceMode, mapDarkStyleUrl=$mapDarkStyleUrl, mapLightStyleUrl=$mapLightStyleUrl, minFaces=$minFaces, oauthButtonText=$oauthButtonText, publicUsers=$publicUsers, trashDays=$trashDays, userDeleteDelay=$userDeleteDelay]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
+      json[r'demoAutoLogin'] = this.demoAutoLogin;
+      json[r'demoMode'] = this.demoMode;
       json[r'externalDomain'] = this.externalDomain;
       json[r'isInitialized'] = this.isInitialized;
       json[r'isOnboarded'] = this.isOnboarded;
@@ -132,6 +145,8 @@ class ServerConfigDto {
       final json = value.cast<String, dynamic>();
 
       return ServerConfigDto(
+        demoAutoLogin: mapValueOfType<bool>(json, r'demoAutoLogin')!,
+        demoMode: mapValueOfType<bool>(json, r'demoMode')!,
         externalDomain: mapValueOfType<String>(json, r'externalDomain')!,
         isInitialized: mapValueOfType<bool>(json, r'isInitialized')!,
         isOnboarded: mapValueOfType<bool>(json, r'isOnboarded')!,
@@ -191,6 +206,8 @@ class ServerConfigDto {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
+    'demoAutoLogin',
+    'demoMode',
     'externalDomain',
     'isInitialized',
     'isOnboarded',

@@ -242,7 +242,7 @@
         return [];
       }
       void manager.recentsRevision;
-      const isAdmin = (authManager.authenticated ? authManager.user : undefined)?.isAdmin ?? false;
+      const canPreviewAdmin = authManager.canPreviewAdmin;
       const flags = featureFlagsManager.valueOrUndefined;
       return getEntries().filter((e) => {
         if (e.kind !== 'navigate') {
@@ -252,7 +252,7 @@
         if (!live) {
           return false;
         }
-        if (live.adminOnly && !isAdmin) {
+        if (live.adminOnly && !canPreviewAdmin) {
           return false;
         }
         if (live.featureFlag && !flags?.[live.featureFlag]) {

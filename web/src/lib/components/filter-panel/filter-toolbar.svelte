@@ -12,6 +12,7 @@
     showFilters?: boolean;
     filters?: Snippet;
     class?: string;
+    groupingGlow?: boolean;
   }
 
   let {
@@ -22,6 +23,7 @@
     showFilters = false,
     filters,
     class: className = '',
+    groupingGlow = false,
   }: Props = $props();
 </script>
 
@@ -43,7 +45,13 @@
   >
     {#if showGrouping}
       <div class="hidden md:flex md:items-center" data-testid="timeline-desktop-grouping-control">
-        <TimelineGroupingControl {grouping} {onGroupingChange} disabled={groupingDisabled} />
+        <div
+          class="w-fit rounded-full"
+          data-testid="demo-grouping-glow"
+          style={groupingGlow ? 'animation: demo-glow-pulse 2s ease-in-out infinite' : ''}
+        >
+          <TimelineGroupingControl {grouping} {onGroupingChange} disabled={groupingDisabled} />
+        </div>
       </div>
     {/if}
 

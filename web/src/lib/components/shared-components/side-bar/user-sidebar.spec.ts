@@ -1,9 +1,10 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/svelte';
+import { fireEvent, render, screen } from '@testing-library/svelte';
 import UserSidebar from '$lib/components/shared-components/side-bar/UserSidebar.svelte';
 
 const mocks = vi.hoisted(() => ({
   authManager: {
+    isDemo: false,
     preferences: {
       folders: { enabled: false, sidebarWeb: false },
       memories: { enabled: true },
@@ -61,7 +62,10 @@ vi.mock('@immich/ui', async () => {
 
 describe('UserSidebar', () => {
   beforeEach(() => {
+    localStorage.clear();
+    mocks.authManager.isDemo = false;
     mocks.authManager.preferences.memories.enabled = true;
+    mocks.featureFlagsManager.value.map = false;
   });
 
   it('shows a memories link under Library when memories are enabled', () => {
@@ -76,5 +80,32 @@ describe('UserSidebar', () => {
     render(UserSidebar);
 
     expect(screen.queryByRole('link', { name: /^memories$/i })).not.toBeInTheDocument();
+  });
+
+  it('highlights the memories link in demo mode until it is clicked', async () => {
+    mocks.authManager.isDemo = true;
+
+    render(UserSidebar);
+
+    const memoriesLink = screen.getByRole('link', { name: /^memories$/i });
+    expect(memoriesLink).toHaveClass('demo-memories-glow');
+
+    await fireEvent.click(memoriesLink);
+
+    expect(localStorage.getItem('demo-memories-clicked')).toBe('true');
+  });
+
+  it('highlights the map link in demo mode until it is clicked', async () => {
+    mocks.authManager.isDemo = true;
+    mocks.featureFlagsManager.value.map = true;
+
+    render(UserSidebar);
+
+    const mapLink = screen.getByRole('link', { name: /^map$/i });
+    expect(mapLink).toHaveClass('demo-new-feature-glow');
+
+    await fireEvent.click(mapLink);
+
+    expect(localStorage.getItem('demo-map-clicked')).toBe('true');
   });
 });

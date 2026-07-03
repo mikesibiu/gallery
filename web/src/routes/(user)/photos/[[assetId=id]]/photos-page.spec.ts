@@ -31,6 +31,7 @@ const {
     isAllUserOwned: true,
   },
   mockAuthManager: {
+    isDemo: false,
     preferences: { memories: { enabled: false } },
   },
   mockMemoryManager: {
@@ -189,11 +190,14 @@ vi.mock('$lib/services/asset.service', () => ({
   getAssetBulkActions: vi.fn(() => ({})),
 }));
 
-vi.mock('$lib/utils', () => ({
-  createUrl: vi.fn(() => ''),
-  getAssetMediaUrl: vi.fn(() => ''),
-  memoryLaneTitle: vi.fn(() => 'memory'),
-}));
+vi.mock('$lib/utils', async () => {
+  const { readable } = await import('svelte/store');
+  return {
+    createUrl: vi.fn(() => ''),
+    getAssetMediaUrl: vi.fn(() => ''),
+    memoryLaneTitle: readable((memory: { title?: string }) => memory.title ?? 'memory'),
+  };
+});
 
 vi.mock('$lib/utils/file-uploader', () => ({
   openFileUploadDialog: vi.fn(),
@@ -207,9 +211,12 @@ vi.mock('$lib/utils/photos-filter-options', async (importOriginal) => {
   };
 });
 
-vi.mock('$lib/utils/thumbnail-util', () => ({
-  getAltText: vi.fn(() => 'alt'),
-}));
+vi.mock('$lib/utils/thumbnail-util', async () => {
+  const { readable } = await import('svelte/store');
+  return {
+    getAltText: readable(() => 'alt'),
+  };
+});
 
 vi.mock('$lib/utils/timeline-util', () => ({
   toTimelineAsset: vi.fn((asset) => asset),
@@ -229,6 +236,8 @@ describe('Photos page search URL state', () => {
     lang.set('de');
     mockAssetMultiSelectManager.selectionActive = false;
     mockAssetMultiSelectManager.assets = [];
+    mockAuthManager.isDemo = false;
+    mockAuthManager.preferences = { memories: { enabled: false } };
     mockMemoryManager.memories = [];
     mockRegisterSearchablePageFilters.mockReturnValue(vi.fn());
     sessionStorage.clear();
@@ -964,5 +973,59 @@ describe('Photos page search URL state', () => {
         JSON.stringify({ grouping: 'year', hasHandler: true }),
       );
     });
+  });
+
+  it('highlights the South Africa memory card in demo mode', () => {
+    mockPage.url = new URL('https://gallery.test/photos');
+    mockAuthManager.isDemo = true;
+    mockAuthManager.preferences = { memories: { enabled: true } };
+    mockMemoryManager.memories = [
+      {
+        id: 'south-africa-memory',
+        title: 'Your recent trip to South Africa',
+        assets: [{ id: 'asset-1' }],
+      },
+    ];
+
+    renderPage();
+
+    expect(screen.getByText('Your recent trip to South Africa').closest('a')).toHaveClass('demo-memory-glow');
+  });
+
+  it('flashes the desktop grouping control in demo mode to highlight it', async () => {
+    localStorage.removeItem('demo-timeline-grouping-clicked');
+    mockPage.url = new URL('https://gallery.test/photos');
+    mockAuthManager.isDemo = true;
+
+    renderPage();
+
+    const glow = await screen.findByTestId('demo-grouping-glow');
+    expect(glow.getAttribute('style') ?? '').toContain('demo-glow-pulse');
+  });
+
+  it('does not flash the desktop grouping control outside demo mode', async () => {
+    mockPage.url = new URL('https://gallery.test/photos');
+    mockAuthManager.isDemo = false;
+
+    renderPage();
+
+    const glow = await screen.findByTestId('demo-grouping-glow');
+    expect(glow.getAttribute('style') ?? '').not.toContain('demo-glow-pulse');
+  });
+
+  it('stops flashing the grouping control once the user changes grouping', async () => {
+    localStorage.removeItem('demo-timeline-grouping-clicked');
+    mockPage.url = new URL('https://gallery.test/photos');
+    mockAuthManager.isDemo = true;
+
+    renderPage();
+
+    await fireEvent.click(await screen.findByTestId('timeline-grouping-year'));
+
+    await waitFor(() => {
+      const glow = screen.getByTestId('demo-grouping-glow');
+      expect(glow.getAttribute('style') ?? '').not.toContain('demo-glow-pulse');
+    });
+    expect(localStorage.getItem('demo-timeline-grouping-clicked')).toBe('true');
   });
 });

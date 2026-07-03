@@ -13,6 +13,7 @@
     icon?: string;
     subtitleSnippet?: Snippet;
     children?: Snippet;
+    class?: string;
   }
 
   let {
@@ -24,6 +25,7 @@
     icon = '',
     subtitleSnippet,
     children,
+    class: className = '',
   }: Props = $props();
 
   let accordionElement: HTMLDivElement | undefined = $state();
@@ -57,7 +59,7 @@
 <div
   class="mt-4 rounded-2xl border-2 border-primary/20 px-6 py-4 transition-all {isOpen
     ? 'border-primary/60 shadow-md'
-    : ''}"
+    : ''} {className}"
   bind:this={accordionElement}
 >
   <button

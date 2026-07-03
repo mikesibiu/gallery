@@ -147,6 +147,7 @@
   key="user-groups"
   title={$t('user_groups')}
   subtitle={$t('manage_user_groups')}
+  class={authManager.isDemo ? 'demo-new-feature-glow' : ''}
 >
   <GroupSettings user={authManager.user} />
 </SettingAccordion>

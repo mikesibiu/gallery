@@ -335,7 +335,7 @@ export const defaults = Object.freeze<SystemConfig>({
       modelName: 'buffalo_l',
       minScore: 0.7,
       maxDistance: 0.5,
-      minFaces: 3,
+      minFaces: 1,
     },
     ocr: {
       enabled: true,
@@ -345,7 +345,7 @@ export const defaults = Object.freeze<SystemConfig>({
       maxResolution: 736,
     },
     petDetection: {
-      enabled: false,
+      enabled: true,
       modelName: 'yolo11s',
       minScore: 0.6,
     },

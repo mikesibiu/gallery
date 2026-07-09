@@ -87,6 +87,15 @@ All S3 variables are set on the `immich-server` container.
 </details>
 
 <details>
+<summary>Backblaze B2</summary>
+
+1. Create a private bucket and a bucket-scoped **Read and Write** application key by following Backblaze's official guides: [Getting Started with the S3 Compatible API](https://help.backblaze.com/hc/en-us/articles/360047425453-Getting-Started-with-the-S3-Compatible-API) and [S3-Compatible App Keys](https://www.backblaze.com/docs/cloud-storage-s3-compatible-app-keys). Note that B2's **master key does not work** with the S3-compatible API — you must create an application key.
+2. Map B2's values to Gallery's variables: the bucket's "S3 Compatible" endpoint (e.g. `s3.us-east-005.backblazeb2.com`) goes in `IMMICH_S3_ENDPOINT` with an `https://` prefix; the region embedded in that hostname (e.g. `us-east-005`) is your `IMMICH_S3_REGION`; the key's **keyID** is the access key ID and its **applicationKey** is the secret access key.
+3. Recommended: add a [lifecycle rule](https://www.backblaze.com/docs/cloud-storage-lifecycle-rules) that cancels unfinished large-file uploads after a few days. Gallery uploads large files via S3 multipart; if the server is interrupted mid-upload, B2 retains (and bills for) the unfinished parts until a lifecycle rule cleans them up.
+
+</details>
+
+<details>
 <summary>Cloudflare R2</summary>
 
 1. In the Cloudflare dashboard, go to **R2 Object Storage** and create a bucket.
@@ -339,6 +348,22 @@ IMMICH_S3_SERVE_MODE=proxy
 :::tip
 When MinIO runs in the same Docker Compose stack, use the service name (e.g. `http://minio:9000`) as the endpoint.
 Set `IMMICH_S3_SERVE_MODE=proxy` since clients cannot reach the internal Docker network directly.
+:::
+
+### Backblaze B2
+
+```bash title=".env"
+IMMICH_STORAGE_BACKEND=s3
+IMMICH_S3_BUCKET=my-gallery-storage
+IMMICH_S3_REGION=us-east-005
+IMMICH_S3_ENDPOINT=https://s3.us-east-005.backblazeb2.com
+IMMICH_S3_ACCESS_KEY_ID=your-b2-key-id
+IMMICH_S3_SECRET_ACCESS_KEY=your-b2-application-key
+IMMICH_S3_SERVE_MODE=redirect
+```
+
+:::tip
+B2 accepts the standard `aws s3api put-bucket-cors` command shown above for `redirect` mode (verified against the S3-compatible API). Note that B2 lowercases the `ExposeHeaders` names when reading the policy back — this is cosmetic and does not affect behavior.
 :::
 
 ### Cloudflare R2

@@ -78,6 +78,7 @@ Content-Type: application/json
   "direction": "toS3",
   "deleteSource": false,
   "concurrency": 5,
+  "fileTypes": {},
   "fileTypes": {
     "originals": true,
     "thumbnails": true,
